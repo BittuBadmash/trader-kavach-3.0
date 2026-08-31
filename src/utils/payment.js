@@ -118,9 +118,25 @@ export async function openCashfreeCheckout({
     }
 
     console.log(
-      'Subscription Session:',
-      subscriptionSessionId
-    );
+  'Subscription Session:',
+  subscriptionSessionId
+);
+
+// Save subscription details so the payment-success page
+// can verify the subscription after Cashfree redirects.
+if (data?.subscription_id) {
+  sessionStorage.setItem(
+    'trader_kavach_subscription_id',
+    data.subscription_id
+  );
+}
+
+if (userId) {
+  sessionStorage.setItem(
+    'trader_kavach_user_id',
+    userId
+  );
+}
 
     // -------------------------------------
     // LOAD CASHFREE
