@@ -33,7 +33,7 @@ export async function openCashfreeCheckout({
     console.log('Creating Trader Kavach subscription...');
 
     const response = await fetch(
-      `${API_BASE}/api/create-cashfree-order`,
+      `${API_BASE}/api/create-subscription`,
       {
         method: 'POST',
         headers: {
