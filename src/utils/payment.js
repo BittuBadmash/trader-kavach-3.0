@@ -30,6 +30,15 @@ export async function openCashfreeCheckout({
       );
     }
 
+    const name =
+      user?.displayName ||
+      user?.name ||
+      'Trader Kavach User';
+
+    const email =
+      user?.email ||
+      'trader@example.com';
+
     console.log('Creating Trader Kavach subscription...');
 
     const response = await fetch(
@@ -40,10 +49,9 @@ export async function openCashfreeCheckout({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user?.uid || 'GUEST_USER',
-          email: user?.email || 'trader@example.com',
+          name,
+          email,
           phone,
-          amount: PREMIUM_PRICE_INR,
         }),
       }
     );
@@ -55,10 +63,10 @@ export async function openCashfreeCheckout({
       data
     );
 
-    if (!response.ok) {
+    if (!response.ok || data?.success === false) {
       throw new Error(
-        data?.message ||
-          data?.error ||
+        data?.error ||
+          data?.message ||
           'Subscription create nahi ho saki.'
       );
     }
@@ -97,7 +105,7 @@ export async function openCashfreeCheckout({
       );
 
       throw new Error(
-        result.error.message ||
+        result.error?.message ||
           'Cashfree checkout fail ho gaya.'
       );
     }
@@ -140,7 +148,7 @@ export async function verifyCashfreeSubscription(
     }
 
     const response = await fetch(
-      `${API_BASE}/api/verify-cashfree-subscription?subscription_id=${encodeURIComponent(
+      `${API_BASE}/api/verify-subscription?subscription_id=${encodeURIComponent(
         subscriptionId
       )}`
     );
