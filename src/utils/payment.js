@@ -24,11 +24,19 @@ export async function openCashfreeCheckout({
   onError,
 }) {
   try {
-    if (!phone || !/^\d{10}$/.test(phone)) {
+    // -------------------------------------
+    // PHONE VALIDATION
+    // -------------------------------------
+
+    if (!phone || !/^\d{10}$/.test(String(phone))) {
       throw new Error(
         'Kripya valid 10-digit mobile number darj karein.'
       );
     }
+
+    // -------------------------------------
+    // CUSTOMER DETAILS
+    // -------------------------------------
 
     const name =
       user?.displayName ||
@@ -39,22 +47,43 @@ export async function openCashfreeCheckout({
       user?.email ||
       'trader@example.com';
 
-    console.log('Creating Trader Kavach subscription...');
+    const userId =
+      user?.uid ||
+      user?.id ||
+      '';
+
+    console.log('Creating Trader Kavach subscription...', {
+      userId,
+      name,
+      email,
+      phone,
+    });
+
+    // -------------------------------------
+    // CREATE SUBSCRIPTION
+    // -------------------------------------
 
     const response = await fetch(
       `${API_BASE}/api/create-subscription`,
       {
         method: 'POST',
+
         headers: {
           'Content-Type': 'application/json',
         },
+
         body: JSON.stringify({
-          name,
-          email,
-          phone,
+          user_id: userId,
+          customer_name: name,
+          customer_email: email,
+          customer_phone: String(phone),
         }),
       }
     );
+
+    // -------------------------------------
+    // READ WORKER RESPONSE
+    // -------------------------------------
 
     const data = await response.json();
 
@@ -63,13 +92,21 @@ export async function openCashfreeCheckout({
       data
     );
 
+    // -------------------------------------
+    // WORKER ERROR
+    // -------------------------------------
+
     if (!response.ok || data?.success === false) {
       throw new Error(
         data?.error ||
           data?.message ||
-          'Subscription create nahi ho saki.'
+          `Subscription create nahi ho saki. HTTP ${response.status}`
       );
     }
+
+    // -------------------------------------
+    // GET CASHFREE SESSION
+    // -------------------------------------
 
     const subscriptionSessionId =
       data?.subscription_session_id;
@@ -85,7 +122,21 @@ export async function openCashfreeCheckout({
       subscriptionSessionId
     );
 
+    // -------------------------------------
+    // LOAD CASHFREE
+    // -------------------------------------
+
     const cashfree = await getCashfree();
+
+    if (!cashfree) {
+      throw new Error(
+        'Cashfree SDK load nahi ho saka.'
+      );
+    }
+
+    // -------------------------------------
+    // OPEN CASHFREE CHECKOUT
+    // -------------------------------------
 
     const result =
       await cashfree.subscriptionsCheckout({
@@ -98,6 +149,10 @@ export async function openCashfreeCheckout({
       result
     );
 
+    // -------------------------------------
+    // CASHFREE CHECKOUT ERROR
+    // -------------------------------------
+
     if (result?.error) {
       console.error(
         'Cashfree Error:',
@@ -109,6 +164,10 @@ export async function openCashfreeCheckout({
           'Cashfree checkout fail ho gaya.'
       );
     }
+
+    // -------------------------------------
+    // PAYMENT SUCCESS
+    // -------------------------------------
 
     if (result?.paymentDetails) {
       console.log(
@@ -124,6 +183,7 @@ export async function openCashfreeCheckout({
     }
 
     return result;
+
   } catch (error) {
     console.error(
       'Trader Kavach Checkout Error:',
@@ -133,8 +193,14 @@ export async function openCashfreeCheckout({
     if (onError) {
       onError(error);
     }
+
+    throw error;
   }
 }
+
+// =====================================
+// VERIFY CASHFREE SUBSCRIPTION
+// =====================================
 
 export async function verifyCashfreeSubscription(
   subscriptionId
@@ -169,9 +235,12 @@ export async function verifyCashfreeSubscription(
         status === 'ACTIVE' ||
         status === 'SUCCESS' ||
         data?.paid === true,
+
       status,
+
       data,
     };
+
   } catch (error) {
     console.error(
       'Subscription verification error:',
@@ -184,6 +253,10 @@ export async function verifyCashfreeSubscription(
     };
   }
 }
+
+// =====================================
+// LEGACY ORDER VERIFICATION
+// =====================================
 
 export async function verifyCashfreeOrder(orderId) {
   return verifyCashfreeSubscription(orderId);
