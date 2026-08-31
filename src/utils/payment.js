@@ -2,6 +2,9 @@ import { load } from '@cashfreepayments/cashfree-js';
 
 export const PREMIUM_PRICE_INR = 99;
 
+const API_BASE =
+  'https://morning-glitter-4c00.bhupendraahirwar0786.workers.dev';
+
 let cashfreeInstance = null;
 
 const getCashfree = async () => {
@@ -30,7 +33,7 @@ export async function openCashfreeCheckout({
     console.log('Creating Trader Kavach subscription...');
 
     const response = await fetch(
-      '/api/create-cashfree-order',
+      `${API_BASE}/api/create-cashfree-order`,
       {
         method: 'POST',
         headers: {
@@ -47,33 +50,25 @@ export async function openCashfreeCheckout({
 
     const data = await response.json();
 
-    console.log('Trader Kavach Worker Response:', data);
+    console.log(
+      'Trader Kavach Worker Response:',
+      data
+    );
 
     if (!response.ok) {
       throw new Error(
         data?.message ||
-        data?.error ||
-        'Subscription create nahi ho saki.'
+          data?.error ||
+          'Subscription create nahi ho saki.'
       );
     }
-
-    /*
-     * IMPORTANT:
-     * Cashfree Subscription API returns:
-     *
-     * subscription_session_id
-     *
-     * NOT:
-     *
-     * payment_session_id
-     */
 
     const subscriptionSessionId =
       data?.subscription_session_id;
 
     if (!subscriptionSessionId) {
       throw new Error(
-        'Cashfree subscription_session_id nahi mila. Backend response check karein.'
+        'Cashfree subscription_session_id nahi mila.'
       );
     }
 
@@ -83,13 +78,6 @@ export async function openCashfreeCheckout({
     );
 
     const cashfree = await getCashfree();
-
-    /*
-     * Cashfree Subscription Checkout
-     *
-     * subscriptionsCheckout()
-     * + subsSessionId
-     */
 
     const result =
       await cashfree.subscriptionsCheckout({
@@ -110,7 +98,7 @@ export async function openCashfreeCheckout({
 
       throw new Error(
         result.error.message ||
-        'Cashfree checkout fail ho gaya.'
+          'Cashfree checkout fail ho gaya.'
       );
     }
 
@@ -127,11 +115,6 @@ export async function openCashfreeCheckout({
       return result.paymentDetails;
     }
 
-    /*
-     * Subscription checkout may redirect/complete
-     * without returning paymentDetails immediately.
-     */
-
     return result;
   } catch (error) {
     console.error(
@@ -145,7 +128,6 @@ export async function openCashfreeCheckout({
   }
 }
 
-
 export async function verifyCashfreeSubscription(
   subscriptionId
 ) {
@@ -158,7 +140,7 @@ export async function verifyCashfreeSubscription(
     }
 
     const response = await fetch(
-      `/api/verify-cashfree-subscription?subscription_id=${encodeURIComponent(
+      `${API_BASE}/api/verify-cashfree-subscription?subscription_id=${encodeURIComponent(
         subscriptionId
       )}`
     );
@@ -194,17 +176,6 @@ export async function verifyCashfreeSubscription(
     };
   }
 }
-
-
-/*
- * Backward-compatible function.
- *
- * Existing components may still call:
- * verifyCashfreeOrder()
- *
- * We keep it here so the application does not
- * break while we finish the subscription flow.
- */
 
 export async function verifyCashfreeOrder(orderId) {
   return verifyCashfreeSubscription(orderId);
