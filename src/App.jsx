@@ -7,6 +7,7 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Dashboard from './components/DashboardPro';
 import CapitalSetup from './components/CapitalSetup';
+import UsdCapitalBar from './components/UsdCapitalBar';
 import SeoPage, { isSeoPath } from './components/SeoPage';
 import { verifyCashfreeSubscription } from './utils/payment';
 
@@ -124,6 +125,7 @@ export default function App() {
       {!user && !showingSeoPage && route === 'home' && <Home onLogin={() => setRoute('login')} />}
       {!user && !showingSeoPage && route === 'login' && <Login onBack={() => setRoute('home')} onAuthSuccess={() => setRoute('dashboard')} />}
       {user && <>
+        <UsdCapitalBar />
         <Dashboard user={user} isPremium={isPremium} onPremiumActivated={() => setIsPremium(true)} />
         <button
           onClick={() => setCapitalSetupOpen(true)}
