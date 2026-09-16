@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Login from './components/Login';
 import Dashboard from './components/DashboardPro';
+import CapitalSetup from './components/CapitalSetup';
 import SeoPage, { isSeoPath } from './components/SeoPage';
 import { verifyCashfreeSubscription } from './utils/payment';
 
@@ -16,6 +17,7 @@ export default function App() {
   const [booting, setBooting] = useState(true);
   const [globalError, setGlobalError] = useState('');
   const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [capitalSetupOpen, setCapitalSetupOpen] = useState(false);
   const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
   const showingSeoPage = !user && isSeoPath(currentPath) && currentPath !== '/';
 
@@ -60,6 +62,13 @@ export default function App() {
       return undefined;
     }
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    try {
+      if (!localStorage.getItem('trader_kavach_mission')) setCapitalSetupOpen(true);
+    } catch {}
+  }, [user]);
 
   useEffect(() => {
     if (!cashfreeSubscriptionId || !user) return;
@@ -114,7 +123,15 @@ export default function App() {
       {!user && showingSeoPage && <SeoPage path={currentPath} />}
       {!user && !showingSeoPage && route === 'home' && <Home onLogin={() => setRoute('login')} />}
       {!user && !showingSeoPage && route === 'login' && <Login onBack={() => setRoute('home')} onAuthSuccess={() => setRoute('dashboard')} />}
-      {user && <Dashboard user={user} isPremium={isPremium} onPremiumActivated={() => setIsPremium(true)} />}
+      {user && <>
+        <Dashboard user={user} isPremium={isPremium} onPremiumActivated={() => setIsPremium(true)} />
+        <button
+          onClick={() => setCapitalSetupOpen(true)}
+          title="Set or edit starting capital"
+          style={{position:'fixed',right:18,bottom:18,zIndex:1200,border:'1px solid rgba(245,185,66,.35)',background:'#111923',color:'#F5B942',borderRadius:999,padding:'9px 13px',fontSize:10,fontWeight:800,cursor:'pointer',boxShadow:'0 10px 30px rgba(0,0,0,.35)'}}
+        >⚙ CAPITAL</button>
+        {capitalSetupOpen && <CapitalSetup onDone={() => { setCapitalSetupOpen(false); window.location.reload(); }} />}
+      </>}
       <footer className="site-footer"><span>© {new Date().getFullYear()} Trader Kavach</span><span>Risk management tool — not financial advice.</span></footer>
     </div>
   );
