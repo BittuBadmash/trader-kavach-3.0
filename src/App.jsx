@@ -5,7 +5,7 @@ import { auth, db } from './firebase';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/DashboardPro';
 import SeoPage, { isSeoPath } from './components/SeoPage';
 import { verifyCashfreeSubscription } from './utils/payment';
 
@@ -36,7 +36,6 @@ export default function App() {
       setBooting(false);
       return undefined;
     }
-
     try {
       return onAuthStateChanged(auth, async (nextUser) => {
         try {
@@ -104,46 +103,19 @@ export default function App() {
   }
 
   if (booting) {
-    return (
-      <div className="boot-screen">
-        <div className="boot-logo">TK</div>
-        <p>Starting Trader Kavach...</p>
-      </div>
-    );
+    return <div className="boot-screen"><div className="boot-logo">TK</div><p>Starting Trader Kavach...</p></div>;
   }
 
   return (
     <div className="app-shell">
-      <Navbar
-        user={user}
-        onLogin={() => setRoute('login')}
-        onLogout={logout}
-        onHome={() => setRoute(user ? 'dashboard' : 'home')}
-      />
-
+      <Navbar user={user} onLogin={() => setRoute('login')} onLogout={logout} onHome={() => setRoute(user ? 'dashboard' : 'home')} />
       {globalError && <div className="global-error">{globalError}</div>}
       {verifyingPayment && <div className="global-error">Verifying Cashfree subscription...</div>}
-
       {!user && showingSeoPage && <SeoPage path={currentPath} />}
-
       {!user && !showingSeoPage && route === 'home' && <Home onLogin={() => setRoute('login')} />}
-
-      {!user && !showingSeoPage && route === 'login' && (
-        <Login onBack={() => setRoute('home')} onAuthSuccess={() => setRoute('dashboard')} />
-      )}
-
-      {user && (
-        <Dashboard
-          user={user}
-          isPremium={isPremium}
-          onPremiumActivated={() => setIsPremium(true)}
-        />
-      )}
-
-      <footer className="site-footer">
-        <span>© {new Date().getFullYear()} Trader Kavach</span>
-        <span>Risk management tool — not financial advice.</span>
-      </footer>
+      {!user && !showingSeoPage && route === 'login' && <Login onBack={() => setRoute('home')} onAuthSuccess={() => setRoute('dashboard')} />}
+      {user && <Dashboard user={user} isPremium={isPremium} onPremiumActivated={() => setIsPremium(true)} />}
+      <footer className="site-footer"><span>© {new Date().getFullYear()} Trader Kavach</span><span>Risk management tool — not financial advice.</span></footer>
     </div>
   );
 }
