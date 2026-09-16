@@ -21,18 +21,20 @@ export default function CapitalSetup({ onDone }) {
     try {
       const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
       const mission = JSON.parse(localStorage.getItem(KEY) || 'null');
+      const savedCurrency = saved?.currency || 'INR';
+      const savedRate = Number(saved?.usdInr || DEFAULT_USD_INR);
       if (saved) {
         setAmount(String(saved.originalAmount ?? mission?.startingCapital ?? 10000));
-        setCurrency(saved.currency || 'INR');
-        setRate(String(saved.usdInr || DEFAULT_USD_INR));
+        setCurrency(savedCurrency);
+        setRate(String(savedRate));
       } else if (mission) {
         setAmount(String(mission.startingCapital ?? 10000));
       }
       if (mission) {
-        setTarget(String(mission.targetCapital ?? 100000));
+        setTarget(String(savedCurrency === 'USD' ? Number(mission.targetCapital || 100000) / savedRate : mission.targetCapital ?? 100000));
         setDays(String(mission.days ?? 90));
         setRisk(String(mission.riskPerTrade ?? 1));
-        setDailyLoss(String(mission.dailyLossLimit ?? 1000));
+        setDailyLoss(String(savedCurrency === 'USD' ? Number(mission.dailyLossLimit || 1000) / savedRate : mission.dailyLossLimit ?? 1000));
       }
     } catch {}
   }, []);
@@ -92,10 +94,10 @@ export default function CapitalSetup({ onDone }) {
           <input type="number" min="0" value={dailyLoss} onChange={e=>setDailyLoss(e.target.value)} />
         </label>
       </div>
-      <div className="capital-preview"><div><small>YOUR CAPITAL IN USD</small><strong>{usd(usdValue)}</strong></div><div><small>BASE VALUE</small><b>{currency === 'USD' ? `₹${inr(inrValue)}` : `₹${inr(inrValue)}`}</b></div><div><small>USD/INR</small><b>1 USD = ₹{Number(rate || 0).toFixed(2)}</b></div></div>
+      <div className="capital-preview"><div><small>YOUR CAPITAL IN USD</small><strong>{usd(usdValue)}</strong></div><div><small>BASE VALUE</small><b>₹{inr(inrValue)}</b></div><div><small>USD/INR</small><b>1 USD = ₹{Number(rate || 0).toFixed(2)}</b></div></div>
       {error && <div className="capital-error">{error}</div>}
       <button className="capital-save" onClick={save}>SAVE CAPITAL & CONTINUE →</button>
-      <div className="capital-note">You can edit this later from Capital Mission.</div>
+      <div className="capital-note">You can edit this later from the ⚙ CAPITAL button.</div>
     </div>
     <style>{`.capital-setup-backdrop{position:fixed;inset:0;z-index:9999;background:rgba(2,6,12,.82);backdrop-filter:blur(10px);display:grid;place-items:center;padding:20px;font-family:Inter,system-ui,sans-serif}.capital-setup-card{width:min(720px,100%);background:linear-gradient(145deg,#111923,#090F17);border:1px solid #263244;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.55);padding:24px;color:#F8FAFC}.capital-setup-brand{display:flex;gap:10px;align-items:center;margin-bottom:20px}.capital-setup-logo{width:42px;height:42px;border:1px solid #F5B942;border-radius:11px;display:grid;place-items:center;color:#F5B942;font-weight:900}.capital-setup-brand b{font-size:15px}.capital-setup-brand b span{color:#F5B942}.capital-setup-brand small{display:block;color:#64748B;font-size:8px;letter-spacing:1px;margin-top:3px}.capital-setup-title{font-size:25px;font-weight:850}.capital-setup-sub{color:#94A3B8;font-size:12px;line-height:1.6;margin:7px 0 18px}.capital-setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.capital-setup-grid label{font-size:9px;color:#94A3B8}.capital-setup-grid input,.capital-setup-grid select{width:100%;margin-top:5px;background:#0B121B;border:1px solid #263244;color:#F8FAFC;border-radius:7px;padding:10px;font-size:11px;outline:none}.capital-input-row{display:grid;grid-template-columns:95px 1fr;gap:5px}.capital-setup-grid small{display:block;color:#64748B;font-size:7px;margin-top:4px}.capital-preview{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;margin-top:15px;padding:13px;border:1px solid rgba(245,185,66,.25);background:rgba(245,185,66,.055);border-radius:9px}.capital-preview small{display:block;color:#94A3B8;font-size:7px;letter-spacing:.6px}.capital-preview strong{display:block;color:#F5B942;font-size:20px;margin-top:4px}.capital-preview b{display:block;font-size:11px;margin-top:6px}.capital-error{margin-top:10px;padding:9px;border-radius:7px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#F87171;font-size:9px}.capital-save{width:100%;margin-top:13px;border:0;border-radius:8px;background:#F5B942;color:#090E16;padding:11px;font-size:10px;font-weight:900;cursor:pointer}.capital-note{text-align:center;color:#64748B;font-size:8px;margin-top:8px}@media(max-width:620px){.capital-setup-grid,.capital-preview{grid-template-columns:1fr}.capital-setup-card{padding:18px}.capital-setup-title{font-size:21px}}`}</style>
   </div>;
