@@ -7,9 +7,11 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Dashboard from './components/DashboardPro';
 import CapitalSetup from './components/CapitalSetup';
-import UsdCapitalBar from './components/UsdCapitalBar';
 import SeoPage, { isSeoPath } from './components/SeoPage';
 import { verifyCashfreeSubscription } from './utils/payment';
+
+const MISSION_KEY = 'trader_kavach_mission';
+const PROFILE_KEY = 'trader_kavach_currency_profile';
 
 export default function App() {
   const [route, setRoute] = useState('home');
@@ -67,8 +69,13 @@ export default function App() {
   useEffect(() => {
     if (!user) return;
     try {
-      if (!localStorage.getItem('trader_kavach_mission')) setCapitalSetupOpen(true);
-    } catch {}
+      const mission = JSON.parse(localStorage.getItem(MISSION_KEY) || 'null');
+      const profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+      const validUsdSetup = mission && profile?.currency === 'USD' && Number(mission.startingCapital) > 0;
+      if (!validUsdSetup) setCapitalSetupOpen(true);
+    } catch {
+      setCapitalSetupOpen(true);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -112,29 +119,20 @@ export default function App() {
     }
   }
 
-  if (booting) {
-    return <div className="boot-screen"><div className="boot-logo">TK</div><p>Starting Trader Kavach...</p></div>;
-  }
+  if (booting) return <div className="boot-screen"><div className="boot-logo">TK</div><p>Starting Trader Kavach...</p></div>;
 
-  return (
-    <div className="app-shell">
-      <Navbar user={user} onLogin={() => setRoute('login')} onLogout={logout} onHome={() => setRoute(user ? 'dashboard' : 'home')} />
-      {globalError && <div className="global-error">{globalError}</div>}
-      {verifyingPayment && <div className="global-error">Verifying Cashfree subscription...</div>}
-      {!user && showingSeoPage && <SeoPage path={currentPath} />}
-      {!user && !showingSeoPage && route === 'home' && <Home onLogin={() => setRoute('login')} />}
-      {!user && !showingSeoPage && route === 'login' && <Login onBack={() => setRoute('home')} onAuthSuccess={() => setRoute('dashboard')} />}
-      {user && <>
-        <UsdCapitalBar />
-        <Dashboard user={user} isPremium={isPremium} onPremiumActivated={() => setIsPremium(true)} />
-        <button
-          onClick={() => setCapitalSetupOpen(true)}
-          title="Set or edit starting capital"
-          style={{position:'fixed',right:18,bottom:18,zIndex:1200,border:'1px solid rgba(245,185,66,.35)',background:'#111923',color:'#F5B942',borderRadius:999,padding:'9px 13px',fontSize:10,fontWeight:800,cursor:'pointer',boxShadow:'0 10px 30px rgba(0,0,0,.35)'}}
-        >⚙ CAPITAL</button>
-        {capitalSetupOpen && <CapitalSetup onDone={() => { setCapitalSetupOpen(false); window.location.reload(); }} />}
-      </>}
-      <footer className="site-footer"><span>© {new Date().getFullYear()} Trader Kavach</span><span>Risk management tool — not financial advice.</span></footer>
-    </div>
-  );
+  return <div className="app-shell">
+    <Navbar user={user} onLogin={() => setRoute('login')} onLogout={logout} onHome={() => setRoute(user ? 'dashboard' : 'home')} />
+    {globalError && <div className="global-error">{globalError}</div>}
+    {verifyingPayment && <div className="global-error">Verifying Cashfree subscription...</div>}
+    {!user && showingSeoPage && <SeoPage path={currentPath} />}
+    {!user && !showingSeoPage && route === 'home' && <Home onLogin={() => setRoute('login')} />}
+    {!user && !showingSeoPage && route === 'login' && <Login onBack={() => setRoute('home')} onAuthSuccess={() => setRoute('dashboard')} />}
+    {user && <>
+      <Dashboard user={user} isPremium={isPremium} onPremiumActivated={() => setIsPremium(true)} />
+      <button onClick={() => setCapitalSetupOpen(true)} title="Set or edit starting capital" style={{position:'fixed',right:18,bottom:18,zIndex:1200,border:'1px solid rgba(245,185,66,.35)',background:'#111923',color:'#F5B942',borderRadius:999,padding:'9px 13px',fontSize:10,fontWeight:800,cursor:'pointer',boxShadow:'0 10px 30px rgba(0,0,0,.35)'}}>⚙ CAPITAL</button>
+      {capitalSetupOpen && <CapitalSetup onDone={() => { setCapitalSetupOpen(false); window.location.reload(); }} />}
+    </>}
+    <footer className="site-footer"><span>© {new Date().getFullYear()} Trader Kavach</span><span>Risk management tool — not financial advice.</span></footer>
+  </div>;
 }
