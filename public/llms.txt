@@ -1,0 +1,17 @@
+# Trader Kavach
+
+Trader Kavach is a trading risk management and capital planning platform for traders.
+
+Website: https://traderkavach.in/
+
+Core topics and tools:
+- Trading risk calculator
+- Position size calculator
+- Forex risk calculator
+- XAUUSD / gold trading risk planning
+- Risk-reward calculation
+- Trading capital management
+- Trading plan
+- Trading journal
+
+Public educational pages are listed in the XML sitemap. Trader Kavach provides calculation and planning tools and is not financial advice.
