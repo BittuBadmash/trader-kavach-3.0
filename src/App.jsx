@@ -1,138 +1,15 @@
-import { useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from './firebase';
-import Navbar from './components/Navbar';
-import Home from './components/Home';
-import Login from './components/Login';
-import Dashboard from './components/DashboardTheme';
-import CapitalSetup from './components/CapitalSetup';
-import SeoPage, { isSeoPath } from './components/SeoPage';
-import { verifyCashfreeSubscription } from './utils/payment';
-
-const MISSION_KEY = 'trader_kavach_mission';
-const PROFILE_KEY = 'trader_kavach_currency_profile';
-
-export default function App() {
-  const [route, setRoute] = useState('home');
-  const [user, setUser] = useState(null);
-  const [isPremium, setIsPremium] = useState(false);
-  const [booting, setBooting] = useState(true);
-  const [globalError, setGlobalError] = useState('');
-  const [verifyingPayment, setVerifyingPayment] = useState(false);
-  const [capitalSetupOpen, setCapitalSetupOpen] = useState(false);
-  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
-  const showingSeoPage = !user && isSeoPath(currentPath) && currentPath !== '/';
-
-  useEffect(() => {
-    if (currentPath === '/') {
-      document.title = 'Trader Kavach – Trading Risk Management & Position Size Calculator';
-      const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.href = 'https://traderkavach.in/';
-    }
-  }, [currentPath]);
-
-  const [cashfreeSubscriptionId, setCashfreeSubscriptionId] = useState(
-    () => sessionStorage.getItem('trader_kavach_subscription_id') || ''
-  );
-
-  useEffect(() => {
-    if (!auth) {
-      setBooting(false);
-      return undefined;
-    }
-    try {
-      return onAuthStateChanged(auth, async (nextUser) => {
-        try {
-          setUser(nextUser);
-          if (nextUser && db) {
-            const snapshot = await getDoc(doc(db, 'users', nextUser.uid));
-            setIsPremium(snapshot.exists() && snapshot.data()?.isPremium === true);
-          } else {
-            setIsPremium(false);
-          }
-        } catch (error) {
-          console.error('User profile load failed:', error);
-          setIsPremium(false);
-        } finally {
-          setBooting(false);
-        }
-      });
-    } catch (error) {
-      console.error('Auth listener failed:', error);
-      setGlobalError('Authentication service could not be initialized.');
-      setBooting(false);
-      return undefined;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
-    try {
-      const mission = JSON.parse(localStorage.getItem(MISSION_KEY) || 'null');
-      const profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
-      const validUsdSetup = mission && profile?.currency === 'USD' && Number(mission.startingCapital) > 0;
-      if (!validUsdSetup) setCapitalSetupOpen(true);
-    } catch {
-      setCapitalSetupOpen(true);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!cashfreeSubscriptionId || !user) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        setVerifyingPayment(true);
-        const result = await verifyCashfreeSubscription(cashfreeSubscriptionId);
-        if (cancelled) return;
-        if (result?.paid === true) {
-          setIsPremium(true);
-          setRoute('dashboard');
-          sessionStorage.removeItem('trader_kavach_subscription_id');
-          sessionStorage.removeItem('trader_kavach_user_id');
-          setCashfreeSubscriptionId('');
-        } else {
-          setGlobalError(`Payment authorization pending. Current status: ${result?.status || 'UNKNOWN'}`);
-        }
-      } catch (error) {
-        console.error('Cashfree payment verification failed:', error);
-        if (!cancelled) setGlobalError('Payment verification failed. Please try again.');
-      } finally {
-        if (!cancelled) setVerifyingPayment(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [cashfreeSubscriptionId, user]);
-
-  async function logout() {
-    try {
-      if (auth) await signOut(auth);
-      setUser(null);
-      setIsPremium(false);
-      setRoute('home');
-      sessionStorage.removeItem('trader_kavach_subscription_id');
-      sessionStorage.removeItem('trader_kavach_user_id');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      setGlobalError('Logout failed. Please try again.');
-    }
-  }
-
-  if (booting) return <div className="boot-screen"><div className="boot-logo">TK</div><p>Starting Trader Kavach...</p></div>;
-
-  return <div className="app-shell">
-    <Navbar user={user} onLogin={() => setRoute('login')} onLogout={logout} onHome={() => setRoute(user ? 'dashboard' : 'home')} />
-    {globalError && <div className="global-error">{globalError}</div>}
-    {verifyingPayment && <div className="global-error">Verifying Cashfree subscription...</div>}
-    {!user && showingSeoPage && <SeoPage path={currentPath} />}
-    {!user && !showingSeoPage && route === 'home' && <Home onLogin={() => setRoute('login')} />}
-    {!user && !showingSeoPage && route === 'login' && <Login onBack={() => setRoute('home')} onAuthSuccess={() => setRoute('dashboard')} />}
-    {user && <>
-      <Dashboard user={user} isPremium={isPremium} onPremiumActivated={() => setIsPremium(true)} />
-      <button onClick={() => setCapitalSetupOpen(true)} title="Set or edit starting capital" style={{position:'fixed',right:18,bottom:18,zIndex:1200,border:'1px solid rgba(245,185,66,.35)',background:'#111923',color:'#F5B942',borderRadius:999,padding:'9px 13px',fontSize:10,fontWeight:800,cursor:'pointer',boxShadow:'0 10px 30px rgba(0,0,0,.35)'}}>⚙ CAPITAL</button>
-      {capitalSetupOpen && <CapitalSetup onDone={() => { setCapitalSetupOpen(false); window.location.reload(); }} />}
-    </>}
-    <footer className="site-footer"><span>© {new Date().getFullYear()} Trader Kavach</span><span>Risk management tool — not financial advice.</span></footer>
-  </div>;
+import { useEffect,useState } from 'react';
+import { onAuthStateChanged,signOut } from 'firebase/auth';
+import { doc,getDoc } from 'firebase/firestore';
+import { auth,db } from './firebase';
+import Navbar from './components/Navbar';import Home from './components/Home';import Login from './components/Login';import Dashboard from './components/DashboardTheme';import CapitalSetup from './components/CapitalSetup';import SeoPage,{isSeoPath} from './components/SeoPage';import { verifyCashfreeSubscription } from './utils/payment';
+const MISSION_KEY='trader_kavach_mission',PROFILE_KEY='trader_kavach_currency_profile';
+function WelcomeModal({onContinue}){return <div className="tk-welcome-backdrop"><div className="tk-welcome"><div className="tk-welcome-mark">TK</div><span>WELCOME TO TRADER KAVACH</span><h1>Your trading control system starts here.</h1><p>Trader Kavach brings capital planning, risk limits, market watch, journaling and discipline into one focused dashboard. First, complete your personal trading profile.</p><div className="tk-welcome-points"><div><b>01</b><strong>Set capital</strong><small>USD mission and target</small></div><div><b>02</b><strong>Set your rules</strong><small>Risk, loss and trade limits</small></div><div><b>03</b><strong>Preview first</strong><small>Tools unlock after payment</small></div></div><button onClick={onContinue}>COMPLETE MY PROFILE →</button><small className="tk-welcome-note">Risk-management tool — not financial advice.</small></div><style>{`.tk-welcome-backdrop{position:fixed;inset:0;z-index:10000;background:rgba(2,8,4,.9);backdrop-filter:blur(15px);display:grid;place-items:center;padding:18px;font-family:Inter,system-ui,sans-serif}.tk-welcome{width:min(650px,100%);padding:30px;border:1px solid #31513b;border-radius:18px;background:linear-gradient(145deg,#111c15,#09120d);color:#f4faf6;box-shadow:0 35px 110px rgba(0,0,0,.65)}.tk-welcome-mark{width:50px;height:50px;display:grid;place-items:center;border:1px solid #22c55e;border-radius:14px;background:#0b1b10;color:#4ade80;font-weight:900;margin-bottom:18px}.tk-welcome>span{font-size:8px;letter-spacing:1.4px;color:#4ade80;font-weight:900}.tk-welcome h1{font-size:30px;line-height:1.1;margin:8px 0}.tk-welcome p{color:#9eafa4;font-size:12px;line-height:1.7}.tk-welcome-points{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.tk-welcome-points div{padding:12px;border:1px solid #22382a;border-radius:9px;background:#0b1510}.tk-welcome-points b{display:block;color:#4ade80;font-size:8px}.tk-welcome-points strong{display:block;font-size:9px;margin-top:6px}.tk-welcome-points small{display:block;color:#75857b;font-size:7px;margin-top:4px}.tk-welcome button{width:100%;border:0;border-radius:8px;background:#16a34a;color:#fff;padding:13px;font-size:10px;font-weight:900;cursor:pointer}.tk-welcome-note{display:block;text-align:center;color:#64756b;font-size:7px;margin-top:9px}@media(max-width:600px){.tk-welcome{padding:21px}.tk-welcome h1{font-size:23px}.tk-welcome-points{grid-template-columns:1fr}}`}</style></div>}
+export default function App(){const [route,setRoute]=useState('home'),[user,setUser]=useState(null),[isPremium,setIsPremium]=useState(false),[booting,setBooting]=useState(true),[globalError,setGlobalError]=useState(''),[verifyingPayment,setVerifyingPayment]=useState(false),[capitalSetupOpen,setCapitalSetupOpen]=useState(false),[welcomeOpen,setWelcomeOpen]=useState(false);const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';const showingSeoPage=!user&&isSeoPath(currentPath)&&currentPath!=='/';const [cashfreeSubscriptionId,setCashfreeSubscriptionId]=useState(()=>sessionStorage.getItem('trader_kavach_subscription_id')||'');
+ useEffect(()=>{if(currentPath==='/'){document.title='Trader Kavach – Trading Risk Management & Trading Control Center';const c=document.querySelector('link[rel="canonical"]');if(c)c.href='https://traderkavach.in/'}},[currentPath]);
+ useEffect(()=>{if(!auth){setBooting(false);return}try{return onAuthStateChanged(auth,async u=>{try{setUser(u);if(u&&db){const s=await getDoc(doc(db,'users',u.uid));setIsPremium(s.exists()&&s.data()?.isPremium===true)}else setIsPremium(false)}catch(e){console.error(e);setIsPremium(false)}finally{setBooting(false)}})}catch(e){console.error(e);setGlobalError('Authentication service could not be initialized.');setBooting(false)}},[]);
+ useEffect(()=>{if(!user)return;try{const m=JSON.parse(localStorage.getItem(MISSION_KEY)||'null'),p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null');const valid=m&&p?.currency==='USD'&&Number(m.startingCapital)>0;const fresh=sessionStorage.getItem('trader_kavach_new_signup')==='1';if(fresh){setWelcomeOpen(true);setCapitalSetupOpen(false)}else if(!valid)setCapitalSetupOpen(true)}catch{setCapitalSetupOpen(true)}},[user]);
+ useEffect(()=>{if(!cashfreeSubscriptionId||!user)return;let cancelled=false;(async()=>{try{setVerifyingPayment(true);const r=await verifyCashfreeSubscription(cashfreeSubscriptionId);if(cancelled)return;if(r?.paid===true){setIsPremium(true);setRoute('dashboard');sessionStorage.removeItem('trader_kavach_subscription_id');sessionStorage.removeItem('trader_kavach_user_id');setCashfreeSubscriptionId('')}else setGlobalError(`Payment authorization pending. Current status: ${r?.status||'UNKNOWN'}`)}catch(e){console.error(e);if(!cancelled)setGlobalError('Payment verification failed. Please try again.')}finally{if(!cancelled)setVerifyingPayment(false)}})();return()=>{cancelled=true}},[cashfreeSubscriptionId,user]);
+ function continueWelcome(){sessionStorage.removeItem('trader_kavach_new_signup');setWelcomeOpen(false);setCapitalSetupOpen(true)}async function logout(){try{if(auth)await signOut(auth);setUser(null);setIsPremium(false);setRoute('home');sessionStorage.removeItem('trader_kavach_subscription_id');sessionStorage.removeItem('trader_kavach_user_id');sessionStorage.removeItem('trader_kavach_new_signup')}catch(e){console.error(e);setGlobalError('Logout failed. Please try again.')}}if(booting)return <div className="boot-screen"><div className="boot-logo">TK</div><p>Starting Trader Kavach...</p></div>;
+ return <div className="app-shell"><Navbar user={user} onLogin={()=>setRoute('login')} onLogout={logout} onHome={()=>setRoute(user?'dashboard':'home')}/>{globalError&&<div className="global-error">{globalError}</div>}{verifyingPayment&&<div className="global-error">Verifying Cashfree subscription...</div>}{!user&&showingSeoPage&&<SeoPage path={currentPath}/>} {!user&&!showingSeoPage&&route==='home'&&<Home onLogin={()=>setRoute('login')}/>} {!user&&!showingSeoPage&&route==='login'&&<Login onBack={()=>setRoute('home')} onAuthSuccess={()=>setRoute('dashboard')}/>} {user&&<><Dashboard user={user} isPremium={isPremium}/><button onClick={()=>setCapitalSetupOpen(true)} title="Edit capital and trading rules" style={{position:'fixed',right:18,bottom:18,zIndex:1200,border:'1px solid rgba(34,197,94,.35)',background:'#0b1510',color:'#4ade80',borderRadius:999,padding:'9px 13px',fontSize:10,fontWeight:800,cursor:'pointer',boxShadow:'0 10px 30px rgba(0,0,0,.35)'}}>⚙ PROFILE</button>{welcomeOpen&&<WelcomeModal onContinue={continueWelcome}/>} {!welcomeOpen&&capitalSetupOpen&&<CapitalSetup onDone={()=>{setCapitalSetupOpen(false);window.location.reload()}}/>}</>}</div>;
 }
