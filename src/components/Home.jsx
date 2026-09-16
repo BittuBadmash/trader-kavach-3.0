@@ -1,83 +1,18 @@
-const features = [
-  {
-    icon: '◈',
-    title: 'Smart Position Sizer',
-    text: 'Calculate position size from account balance, risk percentage and stop-loss distance.',
-  },
-  {
-    icon: '↗',
-    title: 'Capital Compounding',
-    text: 'Build a controlled 30-day projection using a fixed 2% daily growth model.',
-  },
-  {
-    icon: '⛨',
-    title: 'Daily Drawdown Shield',
-    text: 'Keep your daily loss ceiling visible before you place the next trade.',
-  },
+const features=[
+ {icon:'◈',title:'Risk Control',text:'Set your own risk per trade and daily loss ceiling. Trader Kavach keeps those limits visible before action.'},
+ {icon:'◎',title:"Today's Trade Plan",text:'Your starting capital, target and mission days become a clear daily operating plan — not a market prediction.'},
+ {icon:'◉',title:'Market Watch + TradingView',text:'Keep XAUUSD, BTCUSD, DXY, EURUSD, US500, NAS100 and US30 in one trading control center.'},
+ {icon:'▤',title:'Trade Journal + Stats',text:'Record trades, emotions and P/L so the dashboard can calculate performance and discipline metrics.'},
+ {icon:'✓',title:'Your Rules',text:'Choose the limits that matter to your system: risk, daily loss, trade count, consecutive losses and session.'},
+ {icon:'✦',title:'AI Market Assistant',text:'A dedicated place to ask about live market news and data when the live-data backend is connected.'},
 ];
-
-export default function Home({ onLogin }) {
-  return (
-    <main className="home-page">
-      <section className="hero">
-        <div className="hero-copy">
-          <div className="eyebrow">TRADING RISK MANAGEMENT SYSTEM</div>
-          <h1>Trade with a plan.<br /><span>Protect the account.</span></h1>
-          <p>
-            Trader Kavach is a focused pre-trade risk companion for Forex and
-            Gold traders. Size the trade, define the drawdown limit, and follow
-            the plan.
-          </p>
-          <div className="hero-actions">
-            <button className="btn btn-primary btn-large" onClick={onLogin}>
-              Open Trader Dashboard
-            </button>
-            <span className="risk-note">Built for XAUUSD & Forex</span>
-          </div>
-        </div>
-
-        <div className="hero-terminal">
-          <div className="terminal-top">
-            <span>RISK ENGINE</span><span className="status-dot">● ONLINE</span>
-          </div>
-          <div className="terminal-number">2.00%</div>
-          <div className="terminal-label">MAX RISK / TRADE</div>
-          <div className="terminal-bars">
-            <div><i style={{ width: '82%' }} /></div>
-            <div><i style={{ width: '58%' }} /></div>
-            <div><i style={{ width: '67%' }} /></div>
-            <div><i style={{ width: '41%' }} /></div>
-          </div>
-          <div className="terminal-footer">
-            <span>XAUUSD</span><span>DISCIPLINE MODE</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="features-section">
-        <div className="section-heading">
-          <span className="eyebrow">CORE MODULES</span>
-          <h2>One dashboard. Three critical decisions.</h2>
-        </div>
-        <div className="feature-grid">
-          {features.map((feature) => (
-            <article className="feature-card" key={feature.title}>
-              <div className="feature-icon">{feature.icon}</div>
-              <h3>{feature.title}</h3>
-              <p>{feature.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="founder-card">
-        <div>
-          <span className="eyebrow">FOUNDER</span>
-          <h2>Tr. Bhupendra</h2>
-          <p>Gold Trader &amp; System Developer</p>
-        </div>
-        <div className="founder-badge">SYSTEM<br />FIRST</div>
-      </section>
-    </main>
-  );
-}
+export default function Home({onLogin}){return <main className="home-page tk-home">
+ <section className="tk-home-hero"><div className="tk-home-copy"><span className="tk-home-eyebrow">TRADING CONTROL CENTER • USD MODE</span><h1>Calculate. Control.<br/><span>Trade with a system.</span></h1><p>Trader Kavach brings capital planning, risk limits, market watch, TradingView, journaling and discipline into one focused dashboard for traders.</p><div className="tk-home-actions"><button className="btn btn-primary btn-large" onClick={onLogin}>CREATE YOUR CONTROL CENTER →</button><span>Preview first • Unlock tools after payment</span></div></div><div className="tk-dashboard-preview"><div className="tk-preview-top"><b>TRADER KAVACH</b><span>● CONTROL CENTER</span></div><div className="tk-preview-main"><div className="tk-preview-chart"><div className="tk-line l1"/><div className="tk-line l2"/><div className="tk-line l3"/><div className="tk-candle c1"/><div className="tk-candle c2"/><div className="tk-candle c3"/><div className="tk-candle c4"/><div className="tk-candle c5"/></div><div className="tk-preview-side"><div><small>CAPITAL</small><b>$5,000.00</b></div><div><small>RISK / TRADE</small><b>1.0%</b></div><div><small>TODAY PLAN</small><b>$75.00</b></div><div><small>STATUS</small><strong>CONTROLLED</strong></div></div></div><div className="tk-preview-footer"><span>XAUUSD</span><span>DXY</span><span>EURUSD</span><span>NAS100</span></div></div></section>
+ <section className="tk-home-section"><div className="tk-home-heading"><span>WHY TRADER KAVACH</span><h2>A trader should know the risk before the trade.</h2><p>The platform is designed around a simple sequence: INPUT → CALCULATION → STATUS → ACTION.</p></div><div className="tk-feature-grid">{features.map(f=><article key={f.title}><div>{f.icon}</div><h3>{f.title}</h3><p>{f.text}</p></article>)}</div></section>
+ <section className="tk-how"><div><span>HOW IT WORKS</span><h2>From signup to controlled execution.</h2></div><div className="tk-steps"><div><b>01</b><strong>Sign up</strong><p>Create your account and receive the Trader Kavach welcome onboarding.</p></div><div><b>02</b><strong>Set your profile</strong><p>Enter USD capital, mission target and the rules you want the system to monitor.</p></div><div><b>03</b><strong>Preview the system</strong><p>See the dashboard structure before payment. Actions remain locked.</p></div><div><b>04</b><strong>Unlock tools</strong><p>After successful subscription verification, the complete control center becomes available.</p></div></div></section>
+ <section className="tk-founder"><div><span>FOUNDER</span><h2>Tr. Bhupendra</h2><p>Trader Kavach is being built as a practical trading-control product: less noise, more calculation and rule-based execution.</p></div><div className="tk-founder-mark">TRADER<br/><b>KAVACH</b></div></section>
+ <style>{homeStyles}</style>
+ </main>}
+const homeStyles=`
+.tk-home{background:#07100b;color:#f4faf6}.tk-home-hero{max-width:1220px;margin:auto;padding:70px 24px 55px;display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:center}.tk-home-eyebrow,.tk-home-heading>span,.tk-how>div>span,.tk-founder span{font-size:9px;letter-spacing:1.5px;color:#4ade80;font-weight:900}.tk-home-copy h1{font-size:clamp(40px,5vw,67px);line-height:.98;letter-spacing:-2px;margin:14px 0}.tk-home-copy h1 span{color:#4ade80}.tk-home-copy p{max-width:620px;color:#9cac9f;font-size:15px;line-height:1.75}.tk-home-actions{display:flex;align-items:center;gap:15px;margin-top:24px}.tk-home-actions>span{font-size:9px;color:#718277}.tk-dashboard-preview{border:1px solid #284333;border-radius:16px;background:linear-gradient(145deg,#111c15,#0a120d);box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden}.tk-preview-top,.tk-preview-footer{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #203328;font-size:9px}.tk-preview-top span,.tk-preview-footer{color:#718277}.tk-preview-top b{color:#fff}.tk-preview-main{display:grid;grid-template-columns:1.5fr .8fr;gap:8px;padding:12px}.tk-preview-chart{height:270px;position:relative;overflow:hidden;border:1px solid #1e3325;background:repeating-linear-gradient(0deg,transparent 0 44px,rgba(148,163,184,.05) 45px),repeating-linear-gradient(90deg,transparent 0 54px,rgba(148,163,184,.05) 55px),#07100b}.tk-line{position:absolute;height:1px;background:#22c55e;transform-origin:left}.l1{width:270px;left:15px;top:190px;transform:rotate(-18deg)}.l2{width:210px;left:110px;top:135px;transform:rotate(14deg)}.l3{width:180px;left:205px;top:175px;transform:rotate(-25deg)}.tk-candle{position:absolute;width:7px;border-radius:2px;background:#22c55e;box-shadow:0 0 0 1px #22c55e}.c1{height:45px;left:50px;top:170px}.c2{height:75px;left:105px;top:120px}.c3{height:38px;left:165px;top:140px}.c4{height:100px;left:225px;top:80px}.c5{height:65px;left:285px;top:105px}.tk-preview-side{display:grid;gap:7px}.tk-preview-side div{padding:12px;background:#0b1510;border:1px solid #1e3325;border-radius:8px}.tk-preview-side small{display:block;color:#718277;font-size:7px}.tk-preview-side b,.tk-preview-side strong{display:block;margin-top:7px;font-size:13px}.tk-preview-side strong{color:#4ade80;font-size:9px}.tk-preview-footer{border:0}.tk-home-section,.tk-how,.tk-founder{max-width:1220px;margin:auto;padding:60px 24px}.tk-home-heading{text-align:center;max-width:760px;margin:auto}.tk-home-heading h2,.tk-how h2,.tk-founder h2{font-size:31px;margin:10px 0}.tk-home-heading p{color:#8fa095;font-size:12px}.tk-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:30px}.tk-feature-grid article{padding:22px;border:1px solid #20352a;background:#0c1610;border-radius:12px;min-height:165px}.tk-feature-grid article>div{color:#4ade80;font-size:18px}.tk-feature-grid h3{font-size:13px;margin:12px 0 7px}.tk-feature-grid p{color:#89998f;font-size:10px;line-height:1.6}.tk-how{border-top:1px solid #1b2c22;border-bottom:1px solid #1b2c22;display:grid;grid-template-columns:.7fr 1.5fr;gap:40px}.tk-steps{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tk-steps div{padding:17px;border:1px solid #20352a;background:#0b1510;border-radius:10px}.tk-steps b{color:#4ade80;font-size:9px}.tk-steps strong{display:block;margin-top:8px;font-size:12px}.tk-steps p{color:#89998f;font-size:9px;line-height:1.55}.tk-founder{display:flex;justify-content:space-between;align-items:center;gap:30px}.tk-founder p{max-width:650px;color:#8fa095;line-height:1.6;font-size:11px}.tk-founder-mark{text-align:right;font-weight:900;letter-spacing:2px;color:#dce8df}.tk-founder-mark b{color:#4ade80}@media(max-width:900px){.tk-home-hero,.tk-how{grid-template-columns:1fr}.tk-feature-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.tk-home-hero{padding:40px 16px}.tk-home-copy h1{font-size:42px}.tk-home-actions{flex-direction:column;align-items:flex-start}.tk-feature-grid,.tk-steps{grid-template-columns:1fr}.tk-founder{padding:45px 16px}.tk-preview-chart{height:220px}.tk-home-section,.tk-how{padding:45px 16px}}
+`;
