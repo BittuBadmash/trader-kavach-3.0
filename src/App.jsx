@@ -5,7 +5,7 @@ import { auth, db } from './firebase';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Login from './components/Login';
-import Dashboard from './components/DashboardPro';
+import Dashboard from './components/DashboardTheme';
 import CapitalSetup from './components/CapitalSetup';
 import SeoPage, { isSeoPath } from './components/SeoPage';
 import { verifyCashfreeSubscription } from './utils/payment';
