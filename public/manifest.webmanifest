@@ -1,0 +1,11 @@
+{
+  "name": "Trader Kavach",
+  "short_name": "Kavach",
+  "description": "Trading risk management and trading control center.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080d14",
+  "theme_color": "#080d14",
+  "orientation": "any"
+}
