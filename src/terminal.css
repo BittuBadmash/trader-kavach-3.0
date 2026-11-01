@@ -1,0 +1,26 @@
+:root{color-scheme:dark;--tk-bg:#080d14;--tk-panel:#111925;--tk-panel-2:#151e2b;--tk-line:#273343;--tk-muted:#91a0b3;--tk-text:#e8edf5;--tk-accent:#f5b942;--tk-green:#43c58a}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--tk-bg);scroll-behavior:smooth}
+body{min-height:100vh;background:var(--tk-bg);color:var(--tk-text);padding-bottom:env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit}
+button{-webkit-tap-highlight-color:transparent}
+#root{min-height:100vh}
+.app-shell{background:radial-gradient(ellipse at 80% -10%,rgba(245,185,66,.10),transparent 35%),var(--tk-bg)}
+.navbar{height:66px;padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right));background:rgba(8,13,20,.94);border-bottom:1px solid var(--tk-line);backdrop-filter:blur(18px)}
+.brand-button strong{font-size:13px;letter-spacing:.02em}.brand-button small{color:var(--tk-muted);font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.brand-mark,.boot-logo{background:var(--tk-accent);color:#151922}
+.btn{border-radius:7px;background:var(--tk-panel);border-color:var(--tk-line);font-size:11px;letter-spacing:.02em}
+.btn-primary{background:var(--tk-accent);border-color:var(--tk-accent);color:#171a20}
+.btn-primary:hover{background:#ffd16a}
+.home-page,.dashboard{max-width:1440px}
+.fatal-screen{min-height:100vh;background:var(--tk-bg);padding:24px}
+.fatal-card{background:var(--tk-panel);border:1px solid var(--tk-line);border-radius:14px;color:var(--tk-text)}
+@media(max-width:760px){
+ .navbar{height:60px;padding-top:env(safe-area-inset-top)}
+ .nav-actions{gap:6px}.user-chip{max-width:112px;font-size:10px}
+ .btn{padding:9px 11px}
+ .home-page,.dashboard{padding-top:28px}
+ .auth-page{min-height:calc(100dvh - 60px);padding:34px 14px}
+ .auth-card{padding:23px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
